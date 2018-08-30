@@ -42,9 +42,11 @@ class IssueTable extends Component {
     renderLabels(labels){
         const labelsComponents = [];
 
-        return Array.isArray(labels) && labels.length > 0 ?
+        Array.isArray(labels) && labels.length > 0 ?
             labels.map(l => labelsComponents.push(<Label basic size='mini' key={l.id}>{l.name}</Label>)) : 
             labelsComponents.push(<Label basic size='mini' key={0}>{'N/A'}</Label>)
+        
+        return labelsComponents;
     }
 
     renderRow(row){
