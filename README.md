@@ -1,3 +1,21 @@
+# My Considerations
+
+## Some Libraries I would use if there weren't lib contrainsts
+- Redux
+- Lodash
+- Moment
+- Redux Saga
+
+## Time constraint
+I made a solution taking in consideration time in first place, quality in second. I took ~3 hours to implement this version.I would refactor the code in some areas (like pagination) and would probably make the UI and UX better adding:
+
+- More filters (by issue title, date, detail view etc ...)
+- Adding constanst like URL's and etc to a specific place, it would make it easier to handle in bigger projects
+- I could add animations
+- Implemente Redux and Redux saga
+- Testing
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>

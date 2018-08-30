@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Dimmer, Loader } from 'semantic-ui-react'
+import { Container, Dimmer, Loader, Button } from 'semantic-ui-react'
 
 import { IssueTable } from '../Issues';
 import { Helpers } from '../../utils/Helpers';
@@ -10,7 +10,10 @@ class DashboardScreen extends Component {
         this.state = {
             isLoading: true,
             issues: [],
-            page_totals: 1
+            page_totals: 1,
+            per_page: 10,
+            current_page: 1,
+            filters: 'state='
         }
     }
 
@@ -18,8 +21,12 @@ class DashboardScreen extends Component {
         this.fetchIssues()
     }
 
-    async fetchIssues(page = 1, per_page = 100){
-        return fetch(`https://api.github.com/repos/facebook/react/issues?page=${page}&per_page=${per_page}&access_token=d822898eb1264a67e5dd3780d31ec945634679c6`)
+    async fetchIssues(){
+        const { filters, current_page, per_page } = this.state;
+
+        this.setState({ isLoading: true });
+
+        return fetch(`https://api.github.com/repos/facebook/react/issues?page=${current_page}&per_page=${per_page}&${filters}&access_token=d822898eb1264a67e5dd3780d31ec945634679c6`)
             .then(response => {
                 let header = response.headers.get('Link');
 
@@ -38,6 +45,11 @@ class DashboardScreen extends Component {
             });
     }
 
+    filterBy(state) {
+        const filter = `state=${state}`;
+        this.setState({ filters: filter }, () => this.fetchIssues());
+    }
+
 
     renderLoader(){
         return (
@@ -53,15 +65,22 @@ class DashboardScreen extends Component {
             {
                 this.state.isLoading ? 
                 this.renderLoader():
-                <IssueTable 
-                    data={this.state.issues} 
-                    current_page={this.state.current_page} 
-                    page_totals={this.state.page_totals}
-                    onPageChange={(event, data) => {
-                        this.setState({ current_page: data.activePage});
-                        this.fetchIssues(data.activePage);
-                    }}
-                />
+                (
+                    <div>
+                        <h1>Filter By: </h1>
+                        <Button color='yellow' onClick={() => this.filterBy('open')}>Open</Button>
+                        <Button color='green' onClick={() => this.filterBy('closed')}>Closed</Button>
+                        <IssueTable 
+                            data={this.state.issues} 
+                            current_page={this.state.current_page} 
+                            page_totals={this.state.page_totals}
+                            onPageChange={(event, data) => {
+                                this.setState({ current_page: data.activePage});
+                                this.fetchIssues(data.activePage);
+                            }}
+                        />
+                    </div>
+                )
             }
             </Container>
         )

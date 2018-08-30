@@ -42,11 +42,9 @@ class IssueTable extends Component {
     renderLabels(labels){
         const labelsComponents = [];
 
-        Array.isArray(labels) && labels.length > 0 ?
+        return Array.isArray(labels) && labels.length > 0 ?
             labels.map(l => labelsComponents.push(<Label basic size='mini' key={l.id}>{l.name}</Label>)) : 
             labelsComponents.push(<Label basic size='mini' key={0}>{'N/A'}</Label>)
-
-        return labelsComponents;
     }
 
     renderRow(row){
@@ -80,7 +78,7 @@ class IssueTable extends Component {
 
 IssueTable.propTypes = {
   data: PropTypes.array.isRequired,
-  current_page: PropTypes.number,
+  //current_page: PropTypes.number,
   page_totals: PropTypes.any,
   onPageChange: PropTypes.func
 };
