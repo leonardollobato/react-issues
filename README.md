@@ -15,6 +15,8 @@ I made a solution taking in consideration time in first place, quality in second
 - Implemente Redux and Redux saga
 - Testing
 
+___
+
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
