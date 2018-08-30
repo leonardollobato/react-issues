@@ -26,11 +26,11 @@ class DashboardScreen extends Component {
 
         this.setState({ isLoading: true });
 
-        return fetch(`https://api.github.com/repos/facebook/react/issues?page=${current_page}&per_page=${per_page}&${filters}&access_token=d822898eb1264a67e5dd3780d31ec945634679c6`)
+        return fetch(`https://api.github.com/repos/facebook/react/issues?page=${current_page}&per_page=${per_page}&${filters}`)
             .then(response => {
                 let header = response.headers.get('Link');
 
-                if(header !== ''){
+                if(header){
                     let links = header.split(',');
                     let page_totals = Helpers.getParameterByName('page', links[1]); 
 
