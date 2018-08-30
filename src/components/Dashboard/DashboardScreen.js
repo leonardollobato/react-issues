@@ -1,88 +1,69 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Table } from 'semantic-ui-react';
+import { Container, Dimmer, Loader } from 'semantic-ui-react'
 
-const { Row, Cell, HeaderCell } = Table;
+import { IssueTable } from '../Issues';
+import { Helpers } from '../../utils/Helpers';
 
 class DashboardScreen extends Component {
     constructor(){
         super();
         this.state = {
-            isLoading: false,
-            issues: []
+            isLoading: true,
+            issues: [],
+            page_totals: 1
         }
     }
 
     componentDidMount(){
-        fetch("https://api.github.com/repos/facebook/react/issues")
-        .then(results => {
-            return results.json();
-        })
-        .then( data => {
-            console.log({ data });
-            this.setState({ issues: data });
-        });
+        this.fetchIssues()
     }
 
-    renderFooter() {
+    async fetchIssues(page = 1, per_page = 100){
+        return fetch(`https://api.github.com/repos/facebook/react/issues?page=${page}&per_page=${per_page}&access_token=d822898eb1264a67e5dd3780d31ec945634679c6`)
+            .then(response => {
+                let header = response.headers.get('Link');
+
+                if(header !== ''){
+                    let links = header.split(',');
+                    let page_totals = Helpers.getParameterByName('page', links[1]); 
+
+                    if(page_totals !== '') 
+                        this.setState({ page_totals });
+                }
+
+                return response.json();
+            })
+            .then( data => {
+                this.setState({ issues: data, isLoading: false});
+            });
+    }
+
+
+    renderLoader(){
         return (
-                <Row>
-                    <HeaderCell colSpan='5'>
-                    <Menu floated='right' pagination>
-                        <Menu.Item as='a' icon>
-                        <Icon name='chevron left' />
-                        </Menu.Item>
-                        <Menu.Item as='a'>1</Menu.Item>
-                        <Menu.Item as='a'>2</Menu.Item>
-                        <Menu.Item as='a'>3</Menu.Item>
-                        <Menu.Item as='a'>4</Menu.Item>
-                        <Menu.Item as='a' icon>
-                        <Icon name='chevron right' />
-                        </Menu.Item>
-                    </Menu>
-                    </HeaderCell>
-                </Row>
+            <Dimmer active>
+                <Loader size='massive'>Loading</Loader>
+            </Dimmer>
         )
-    }
-
-    renderHeader(){
-
-        return (
-                <Row>
-                    <HeaderCell>Issue Number</HeaderCell>
-                    <HeaderCell>Title</HeaderCell>
-                    <HeaderCell>Created At</HeaderCell>
-                    <HeaderCell>Updated At</HeaderCell>
-                    <HeaderCell>Labels</HeaderCell>
-                    <HeaderCell>State</HeaderCell>
-                </Row>
-        );
-    }
-
-    renderLabels(labels){
-
-    }
-
-    renderRow(row){
-        return (
-                <Row key={row.id}>
-                    <Cell>{row.number}</Cell>
-                    <Cell>{row.title}</Cell>
-                    <Cell>{row.created_at}</Cell>
-                    <Cell>{row.updated_at}</Cell>
-                    <Cell>{'labels'}</Cell>
-                    <Cell>{row.state}</Cell>
-                </Row>
-        );
     }
 
     render(){
         return (
-            <Table 
-                celled
-                tableData={this.state.issues} 
-                renderBodyRow={data => this.renderRow(data)}
-                footerRow={this.renderFooter()} 
-                headerRow={this.renderHeader()}/>
+            <Container>
+            {
+                this.state.isLoading ? 
+                this.renderLoader():
+                <IssueTable 
+                    data={this.state.issues} 
+                    current_page={this.state.current_page} 
+                    page_totals={this.state.page_totals}
+                    onPageChange={(event, data) => {
+                        this.setState({ current_page: data.activePage});
+                        this.fetchIssues(data.activePage);
+                    }}
+                />
+            }
+            </Container>
         )
     }
 }
